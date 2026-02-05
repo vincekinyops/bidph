@@ -39,7 +39,7 @@ defmodule BidphWeb.PageHTML do
         <div class="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
           <div class="grid items-center gap-10 lg:grid-cols-2">
             <% # Left: image %>
-            <div class="relative aspect-[4/3] rounded-2xl bg-[#101622] shadow-2xl overflow-hidden lg:aspect-auto lg:min-h-[360px] lg:h-full">
+            <div class="relative aspect-[4/3] rounded-2xl bg-[#101622] shadow-2xl overflow-hidden lg:aspect-auto lg:min-h-[520px] lg:h-full">
               <div
                 class="absolute -inset-6 rounded-[28px] opacity-70 blur-3xl"
                 style="background: radial-gradient(60% 60% at 40% 40%, rgba(255,127,0,0.25) 0%, rgba(255,127,0,0.08) 40%, rgba(15,23,42,0) 70%);"

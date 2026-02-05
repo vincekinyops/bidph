@@ -48,6 +48,7 @@ defmodule BidphWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/mock/:file", MockAssetsController, :show
 
     live_session :default, on_mount: [BidphWeb.UserAuthLive] do
       live "/listings", ListingsLive.Index, :index
