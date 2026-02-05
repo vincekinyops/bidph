@@ -1,0 +1,30 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+/_build
+/deps
+/cover
+/doc
+/tmp
+
+# Mix
+*.ez
+erl_crash.dump
+*.beam
+
+# Assets (built in Docker)
+/priv/static/assets
+/priv/static/cache_manifest.json
+/assets/node_modules
+
+# Test
+/test
+
+# IDE and misc
+.env*
+*.md
+!README.md
+.DS_Store
+initial.md

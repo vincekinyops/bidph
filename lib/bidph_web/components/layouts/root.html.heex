@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title default="Bidph" suffix=" · Auctions">
+      {assigns[:page_title]}
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <script defer phx-track-static type="javascript" src={~p"/assets/js/app.js"}>
+    </script>
+    <script>
+      (() => {
+        const setTheme = (theme) => {
+          if (theme === "system") {
+            localStorage.removeItem("phx:theme");
+            document.documentElement.removeAttribute("data-theme");
+          } else {
+            localStorage.setItem("phx:theme", theme);
+            document.documentElement.setAttribute("data-theme", theme);
+          }
+        };
+        if (!document.documentElement.hasAttribute("data-theme")) {
+          setTheme(localStorage.getItem("phx:theme") || "system");
+        }
+        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
+        window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-base-200">
+    <header class="bg-base-100 border-b border-base-300">
+      <div class="mx-auto flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-6">
+          <.link href={~p"/"} class="flex items-center gap-2 font-semibold text-lg">
+            <.icon name="hero-paper-airplane" class="size-6 text-primary" />
+            <span>Bidph</span>
+          </.link>
+          <nav class="hidden md:flex items-center gap-5 text-sm font-medium text-[#64748B]">
+            <.link href={~p"/listings"} class="hover:text-[#0F172A]">All</.link>
+            <.link href={~p"/listings?category=watches"} class="hover:text-[#0F172A]">Watches</.link>
+            <.link href={~p"/listings?category=art"} class="hover:text-[#0F172A]">Art</.link>
+            <.link href={~p"/listings?category=cars"} class="hover:text-[#0F172A]">Cars</.link>
+            <.link href={~p"/listings?category=jewelry"} class="hover:text-[#0F172A]">Jewelry</.link>
+            <.link href={~p"/listings?category=furniture"} class="hover:text-[#0F172A]">Furniture</.link>
+          </nav>
+        </div>
+        <div class="flex items-center gap-3">
+          <form action={~p"/listings"} method="get" class="hidden sm:block">
+            <div class="relative">
+              <.icon name="hero-magnifying-glass" class="size-4 text-base-content/50 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                name="q"
+                placeholder="Search auctions..."
+                class="input input-bordered rounded-full pl-9 pr-4 w-40 lg:w-64 bg-base-200 border-base-300"
+              />
+            </div>
+          </form>
+          <%= if @current_scope && @current_scope.user do %>
+            <div class="dropdown dropdown-end">
+              <label tabindex="0" class="btn btn-ghost btn-circle relative" aria-label="Notifications">
+                <.icon name="hero-bell-alert" class="size-5" />
+                <span class="absolute -right-0.5 -top-0.5 rounded-full bg-warning text-warning-content text-[10px] px-1.5">3</span>
+              </label>
+            </div>
+            <div class="dropdown dropdown-end">
+              <label tabindex="0" class="btn btn-ghost btn-circle" aria-label="Profile">
+                <.icon name="hero-user-circle" class="size-5" />
+              </label>
+              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 mt-2 w-52 border border-base-300 p-2 shadow-lg">
+                <li class="menu-title"><span class="text-sm">{@current_scope.user.email}</span></li>
+                <li :if={@current_scope.user && Bidph.Accounts.User.super_admin?(@current_scope.user)}><.link href={~p"/admin"}>Admin</.link></li>
+                <li><.link href={~p"/users/settings"}>Settings</.link></li>
+                <li><.link href={~p"/users/log-out"} method="delete">Log out</.link></li>
+              </ul>
+            </div>
+            <.link href={~p"/listings/new"} class="btn rounded-full px-5 text-white border-0" style="background-color: #F97316;">
+              Start Selling
+            </.link>
+          <% else %>
+            <.link href={~p"/users/log-in"} class="btn btn-ghost">Log in</.link>
+            <.link href={~p"/users/register"} class="btn rounded-full px-5 text-white border-0" style="background-color: #F97316;">
+              Start Selling
+            </.link>
+          <% end %>
+        </div>
+      </div>
+    </header>
+    <main class="flex-1">
+      {@inner_content}
+    </main>
+    <footer class="footer footer-center sm:footer-items sm:footer-center p-6 bg-base-100 border-t border-base-300 text-base-content">
+      <aside class="grid-flow-col gap-4 sm:place-self-center sm:justify-self-end">
+        <.link href={~p"/"} class="link link-hover">Terms</.link>
+        <.link href={~p"/"} class="link link-hover">Privacy</.link>
+        <.link href={~p"/"} class="link link-hover">Support</.link>
+      </aside>
+      <aside class="sm:place-self-center sm:justify-self-start">
+        <p>© <%= DateTime.utc_now().year %> Bidph. All rights reserved.</p>
+      </aside>
+    </footer>
+  </body>
+</html>
