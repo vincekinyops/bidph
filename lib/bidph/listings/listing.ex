@@ -2,7 +2,7 @@ defmodule Bidph.Listings.Listing do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @statuses ~w(active ended sold cancelled)
+  @statuses ~w(active paused ended sold cancelled)
 
   schema "listings" do
     field :title, :string
@@ -43,6 +43,12 @@ defmodule Bidph.Listings.Listing do
     |> validate_end_at()
     |> set_current_price()
     |> foreign_key_constraint(:user_id)
+  end
+
+  def status_changeset(listing, status) do
+    listing
+    |> change(status: status)
+    |> validate_inclusion(:status, @statuses)
   end
 
   defp validate_end_at(changeset) do

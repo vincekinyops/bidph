@@ -17,6 +17,13 @@ defmodule BidphWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/webhooks", BidphWeb.Webhooks do
+    pipe_through :api
+
+    post "/payments", PaymentController, :create
+    post "/stripe", StripeController, :create
+  end
+
   pipeline :graphql do
     plug :accepts, ["json", "html"]
     plug :fetch_session
@@ -86,6 +93,17 @@ defmodule BidphWeb.Router do
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm-email/:token", UserSettingsController, :confirm_email
+  end
+
+  scope "/", BidphWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :account, on_mount: [BidphWeb.UserAuthLive] do
+      live "/wallet", WalletLive.TopUp, :index
+      live "/payment-methods", PaymentMethodsLive.Index, :index
+      live "/profile", ProfileLive.Show, :show
+      live "/my-listings", MyListingsLive.Index, :index
+    end
   end
 
   scope "/admin", BidphWeb do

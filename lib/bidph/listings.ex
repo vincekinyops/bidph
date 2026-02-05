@@ -8,6 +8,7 @@ defmodule Bidph.Listings do
 
   alias Bidph.Listings.{Listing, Bid}
   alias Bidph.Accounts.User
+  alias Bidph.Payments
 
   @doc """
   Returns the list of listings.
@@ -23,6 +24,25 @@ defmodule Bidph.Listings do
     |> limit(^limit)
     |> Repo.all()
     |> Repo.preload([:user, :bids])
+  end
+
+  @doc """
+  Returns listings for a user.
+  """
+  def list_listings_by_user(%User{id: user_id}) do
+    Listing
+    |> where([l], l.user_id == ^user_id)
+    |> order_by([l], desc: l.inserted_at)
+    |> Repo.all()
+  end
+
+  @doc """
+  Updates a listing status.
+  """
+  def set_listing_status(%Listing{} = listing, status) when is_binary(status) do
+    listing
+    |> Listing.status_changeset(status)
+    |> Repo.update()
   end
 
   @doc """
@@ -87,31 +107,49 @@ defmodule Bidph.Listings do
         {:error, :bid_too_low}
 
       true ->
-        Repo.transaction(fn ->
-          # Mark previous winning bid as not winning
-          from(b in Bid, where: b.listing_id == ^listing.id and b.is_winning == true)
-          |> Repo.update_all(set: [is_winning: false])
+        case Payments.can_bid?(user, amount) do
+          {:error, reason} ->
+            {:error, reason}
 
-          # Insert new bid
-          bid_attrs = %{
-            listing_id: listing.id,
-            user_id: user.id,
-            amount: amount,
-            is_winning: true
-          }
+          {:ok, _} ->
+            Repo.transaction(fn ->
+              # Find and release previous winning bid hold
+              prev_bid =
+                Bid
+                |> where([b], b.listing_id == ^listing.id and b.is_winning == true)
+                |> Repo.one()
 
-          {:ok, bid} =
-            %Bid{}
-            |> Bid.changeset(bid_attrs)
-            |> Repo.insert()
+              if prev_bid do
+                from(b in Bid, where: b.id == ^prev_bid.id)
+                |> Repo.update_all(set: [is_winning: false])
 
-          # Update listing current_price
-          listing
-          |> Ecto.Changeset.change(current_price: amount)
-          |> Repo.update!()
+                Payments.release_hold_for_bid(prev_bid)
+              end
 
-          Repo.preload(bid, [:user])
-        end)
+              # Insert new bid
+              bid_attrs = %{
+                listing_id: listing.id,
+                user_id: user.id,
+                amount: amount,
+                is_winning: true
+              }
+
+              {:ok, bid} =
+                %Bid{}
+                |> Bid.changeset(bid_attrs)
+                |> Repo.insert()
+
+              # Update listing current_price
+              listing
+              |> Ecto.Changeset.change(current_price: amount)
+              |> Repo.update!()
+
+              # Hold funds against payment method and wallet
+              Payments.hold_funds_for_bid!(user, bid, amount)
+
+              Repo.preload(bid, [:user])
+            end)
+        end
     end
   end
 

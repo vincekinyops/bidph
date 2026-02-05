@@ -45,10 +45,12 @@ defmodule Dotenv do
   end
 end
 
+import Ecto.Query
 alias Bidph.Repo
 alias Bidph.Accounts
 alias Bidph.Accounts.User
 alias Bidph.Listings
+alias Bidph.Payments
 
 # Load .env from project root (env vars still override)
 env = Dotenv.load()
@@ -98,6 +100,23 @@ end
 user = Repo.one(from u in User, limit: 1)
 
 if user do
+  # Ensure wallet + payment method for bidding demos
+  wallet = Payments.ensure_wallet(user)
+
+  if Decimal.compare(wallet.balance, 0) == :eq do
+    Payments.top_up_wallet(user, 100_000, "gcash", "seed-topup")
+  end
+
+  if is_nil(Payments.get_active_payment_method(user)) do
+    Payments.add_payment_method(user, %{
+      "provider" => "GCash",
+      "method_type" => "gcash",
+      "last4" => "1234",
+      "status" => "active",
+      "verified_at" => DateTime.utc_now() |> DateTime.truncate(:second)
+    })
+  end
+
   now = DateTime.utc_now() |> DateTime.truncate(:second)
   base_end = DateTime.add(now, 48, :hour)
 

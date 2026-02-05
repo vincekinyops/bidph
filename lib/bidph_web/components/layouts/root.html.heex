@@ -7,10 +7,12 @@
     <.live_title default="Bidph" suffix=" · Auctions">
       {assigns[:page_title]}
     </.live_title>
+    <meta name="stripe-publishable-key" content={System.get_env("STRIPE_PUBLISHABLE_KEY") || ""} />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     />
+    <script src="https://js.stripe.com/v3"></script>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="javascript" src={~p"/assets/js/app.js"}>
     </script>
@@ -75,8 +77,12 @@
               </label>
               <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-50 mt-2 w-52 border border-base-300 p-2 shadow-lg">
                 <li class="menu-title"><span class="text-sm">{@current_scope.user.email}</span></li>
-                <li :if={@current_scope.user && Bidph.Accounts.User.super_admin?(@current_scope.user)}><.link href={~p"/admin"}>Admin</.link></li>
-                <li><.link href={~p"/users/settings"}>Settings</.link></li>
+              <li><.link href={~p"/profile"}>Profile</.link></li>
+              <li><.link href={~p"/my-listings"}>My Listings</.link></li>
+              <li><.link href={~p"/wallet"}>Wallet</.link></li>
+              <li><.link href={~p"/payment-methods"}>Payment Methods</.link></li>
+              <li :if={@current_scope.user && Bidph.Accounts.User.super_admin?(@current_scope.user)}><.link href={~p"/admin"}>Admin</.link></li>
+              <li><.link href={~p"/users/settings"}>Settings</.link></li>
                 <li><.link href={~p"/users/log-out"} method="delete">Log out</.link></li>
               </ul>
             </div>

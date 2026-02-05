@@ -26,10 +26,73 @@ import {hooks as colocatedHooks} from "phoenix-colocated/bidph"
 import topbar from "../vendor/topbar"
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+const StripeHooks = {
+  StripePaymentMethod: {
+    mounted() {
+      this.initStripe()
+      this.setupPaymentMethod()
+    },
+    destroyed() {
+      if (this.card) this.card.unmount()
+    },
+    initStripe() {
+      const key = document.querySelector("meta[name='stripe-publishable-key']")?.content
+      if (!key || !window.Stripe) return
+      this.stripe = window.Stripe(key)
+      const elements = this.stripe.elements()
+      this.card = elements.create("card")
+      this.card.mount(this.el.querySelector("[data-stripe-card]"))
+    },
+    setupPaymentMethod() {
+      const button = this.el.querySelector("[data-stripe-action='create-payment-method']")
+      if (!button || !this.stripe) return
+      button.addEventListener("click", async (e) => {
+        e.preventDefault()
+        const {paymentMethod, error} = await this.stripe.createPaymentMethod({type: "card", card: this.card})
+        const errorEl = this.el.querySelector("[data-stripe-error]")
+        if (error) {
+          if (errorEl) errorEl.textContent = error.message
+          return
+        }
+        if (errorEl) errorEl.textContent = ""
+        this.pushEvent("add_stripe_method", {payment_method_id: paymentMethod.id})
+      })
+    }
+  },
+  StripeTopup: {
+    mounted() {
+      this.initStripe()
+      this.handleEvent("stripe_intent", async ({client_secret}) => {
+        if (!this.stripe || !client_secret) return
+        const {error, paymentIntent} = await this.stripe.confirmCardPayment(client_secret, {
+          payment_method: {card: this.card}
+        })
+        const statusEl = this.el.querySelector("[data-stripe-status]")
+        if (error) {
+          if (statusEl) statusEl.textContent = error.message
+          return
+        }
+        if (statusEl) statusEl.textContent = `Payment ${paymentIntent.status}`
+      })
+    },
+    destroyed() {
+      if (this.card) this.card.unmount()
+    },
+    initStripe() {
+      const key = document.querySelector("meta[name='stripe-publishable-key']")?.content
+      if (!key || !window.Stripe) return
+      this.stripe = window.Stripe(key)
+      const elements = this.stripe.elements()
+      this.card = elements.create("card")
+      this.card.mount(this.el.querySelector("[data-stripe-card]"))
+    }
+  }
+}
+
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, ...StripeHooks},
 })
 
 // Show progress bar on live navigation and form submits

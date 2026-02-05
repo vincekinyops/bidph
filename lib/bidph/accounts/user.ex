@@ -12,6 +12,10 @@ defmodule Bidph.Accounts.User do
     field :avatar_url, :string
     field :bio, :string
     field :is_super_admin, :boolean, default: false
+    field :stripe_customer_id, :string
+
+    has_one :wallet, Bidph.Payments.Wallet
+    has_many :payment_methods, Bidph.Payments.PaymentMethod
 
     timestamps(type: :utc_datetime)
   end

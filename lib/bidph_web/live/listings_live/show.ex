@@ -60,6 +60,8 @@ defmodule BidphWeb.ListingsLive.Show do
                 :listing_not_active -> "Listing is not active"
                 :auction_ended -> "Auction has ended"
                 :bid_too_low -> "Bid must be higher than current price"
+                :no_wallet_funds -> "Insufficient wallet balance to place this bid"
+                :no_payment_method -> "Add a payment method before bidding"
                 _ -> "Could not place bid"
               end
 

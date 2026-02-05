@@ -119,3 +119,20 @@ if config_env() == :prod do
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 end
+
+# --- Mailer (SMTP) ---
+if smtp_host = System.get_env("SMTP_HOST") do
+  config :bidph, Bidph.Mailer,
+    adapter: Swoosh.Adapters.SMTP,
+    relay: smtp_host,
+    username: System.get_env("SMTP_USER"),
+    password: System.get_env("SMTP_PASSWORD"),
+    port: String.to_integer(System.get_env("SMTP_PORT") || "587"),
+    tls: (case (System.get_env("SMTP_TLS") || "always") |> String.downcase() do
+      "never" -> :never
+      "always" -> :always
+      "if_available" -> :if_available
+      _ -> :always
+    end),
+    auth: :always
+end
