@@ -17,7 +17,7 @@ defmodule BidphWeb.PageController do
     |> assign(:featured_listing, featured_listing)
     |> assign(:listings, hot_listings)
     |> assign(:stats, %{
-      total_sales_volume: "$24M+",
+      total_sales_volume: "₱24M+",
       active_auctions: "1,240",
       verified_collectors: "45K+"
     })
@@ -34,7 +34,7 @@ defmodule BidphWeb.PageController do
       current_price: Decimal.new("45000"),
       end_at: DateTime.add(now, 3, :hour),
       category: "Watches",
-      image_urls: [],
+      image_urls: ["/assets/mock/featured-watch-Dja3J0Pt.jpg"],
       bids: [
         %Bid{amount: Decimal.new("45000"), inserted_at: DateTime.add(now, -2, :minute)},
         %Bid{amount: Decimal.new("44500"), inserted_at: DateTime.add(now, -5, :minute)},
@@ -53,7 +53,7 @@ defmodule BidphWeb.PageController do
         current_price: Decimal.new("12500"),
         end_at: DateTime.add(now, 1, :hour),
         category: "Art",
-        image_urls: [],
+        image_urls: ["/assets/mock/auction-art-DXFPezdl.jpg"],
         bids: []
       },
       %Listing{
@@ -62,7 +62,7 @@ defmodule BidphWeb.PageController do
         current_price: Decimal.new("875000"),
         end_at: DateTime.add(now, 5, :hour),
         category: "Cars",
-        image_urls: [],
+        image_urls: ["/assets/mock/auction-car-BKsFwp2x.jpg"],
         bids: []
       },
       %Listing{
@@ -71,7 +71,7 @@ defmodule BidphWeb.PageController do
         current_price: Decimal.new("34000"),
         end_at: DateTime.add(now, 12, :hour),
         category: "Jewelry",
-        image_urls: [],
+        image_urls: ["/assets/mock/auction-jewelry-CLPqj-_P.jpg"],
         bids: []
       },
       %Listing{
@@ -80,7 +80,7 @@ defmodule BidphWeb.PageController do
         current_price: Decimal.new("8500"),
         end_at: DateTime.add(now, 24, :hour),
         category: "Furniture",
-        image_urls: [],
+        image_urls: ["/assets/mock/auction-furniture-CQ8ck3wV.jpg"],
         bids: []
       }
     ]

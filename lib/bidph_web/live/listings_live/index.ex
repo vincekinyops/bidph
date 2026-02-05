@@ -127,7 +127,7 @@ defmodule BidphWeb.ListingsLive.Index do
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="label">Starting Price ($)</label>
+                <label class="label">Starting Price (₱)</label>
                 <input
                   type="number"
                   name="listing[starting_price]"
@@ -139,7 +139,7 @@ defmodule BidphWeb.ListingsLive.Index do
                 />
               </div>
               <div>
-                <label class="label">Reserve Price ($, optional)</label>
+                <label class="label">Reserve Price (₱, optional)</label>
                 <input
                   type="number"
                   name="listing[reserve_price]"
@@ -202,7 +202,7 @@ defmodule BidphWeb.ListingsLive.Index do
         </p>
         <div class="mt-3 flex items-center justify-between">
           <span class="font-mono font-medium text-primary">
-            ${Decimal.to_string(@listing.current_price)}
+            ₱{Decimal.to_string(@listing.current_price)}
           </span>
           <span class="text-xs text-base-content/60">
             Ends {Calendar.strftime(@listing.end_at, "%b %d, %H:%M")}

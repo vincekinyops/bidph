@@ -92,7 +92,7 @@ defmodule BidphWeb.ListingsLive.Show do
 
           <div class="rounded-box border border-base-300 bg-base-200 p-6">
             <div class="text-2xl font-mono font-bold text-primary">
-              ${Decimal.to_string(@listing.current_price)}
+            ₱{Decimal.to_string(@listing.current_price)}
             </div>
             <p class="mt-1 text-sm text-base-content/60">Current bid</p>
 
@@ -153,7 +153,7 @@ defmodule BidphWeb.ListingsLive.Show do
     ~H"""
     <li class="flex justify-between text-sm">
       <span>{@bid.user.email}</span>
-      <span class="font-mono">${Decimal.to_string(@bid.amount)}</span>
+      <span class="font-mono">₱{Decimal.to_string(@bid.amount)}</span>
     </li>
     """
   end

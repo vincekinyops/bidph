@@ -39,13 +39,21 @@ defmodule BidphWeb.PageHTML do
         <div class="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-14">
           <div class="grid items-center gap-10 lg:grid-cols-2">
             <% # Left: image %>
-            <div class="relative aspect-[4/3] rounded-2xl bg-[#101622] shadow-2xl lg:aspect-auto lg:min-h-[360px]">
-          <img
-            :if={@listing.image_urls != []}
-            src={List.first(@listing.image_urls)}
-            alt={@listing.title}
-                class="h-full w-full rounded-2xl object-cover"
-          />
+            <div class="relative aspect-[4/3] rounded-2xl bg-[#101622] shadow-2xl overflow-hidden lg:aspect-auto lg:min-h-[360px] lg:h-full">
+              <div
+                class="absolute -inset-6 rounded-[28px] opacity-70 blur-3xl"
+                style="background: radial-gradient(60% 60% at 40% 40%, rgba(255,127,0,0.25) 0%, rgba(255,127,0,0.08) 40%, rgba(15,23,42,0) 70%);"
+              ></div>
+              <div
+                class="absolute -inset-2 rounded-2xl opacity-60 blur-2xl"
+                style="background: linear-gradient(135deg, rgba(56,189,248,0.25) 0%, rgba(59,130,246,0.15) 40%, rgba(15,23,42,0) 70%);"
+              ></div>
+              <img
+                :if={@listing.image_urls != []}
+                src={List.first(@listing.image_urls)}
+                alt={@listing.title}
+                class="absolute inset-0 h-full w-full object-cover"
+              />
           <div :if={@listing.image_urls == []} class="flex h-full w-full items-center justify-center text-white/30">
             <.icon name="hero-photo" class="size-16" />
           </div>
@@ -75,7 +83,7 @@ defmodule BidphWeb.PageHTML do
               <div class="mt-6 grid grid-cols-2 gap-4">
                 <div class="rounded-xl p-4" style="background-color: #2D3748;">
                   <p class="text-xs" style="color: #94A3B8;">Current Bid</p>
-                  <p class="text-2xl font-bold" style="color: #F97316;">${Decimal.to_string(@listing.current_price)}</p>
+                  <p class="text-2xl font-bold" style="color: #F97316;">₱{Decimal.to_string(@listing.current_price)}</p>
                 </div>
                 <div class="rounded-xl p-4" style="background-color: #2D3748;">
                   <p class="text-xs" style="color: #94A3B8;">Ends In</p>
@@ -96,12 +104,12 @@ defmodule BidphWeb.PageHTML do
                 </div>
                 <div class="mt-2 flex gap-2">
                   <div class="flex flex-1 items-center gap-2 rounded-lg bg-white px-3 py-2 text-gray-900">
-                    <span class="text-gray-500">$</span>
+                    <span class="text-gray-500">₱</span>
                     <span class="flex-1"></span>
                   </div>
                   <span class="inline-flex shrink-0 items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold text-white" style="background-color: #F97316;">Place Bid</span>
                 </div>
-                <p class="mt-2 text-xs" style="color: #94A3B8;">Min bid: ${min_bid_display(@listing.current_price)}</p>
+                <p class="mt-2 text-xs" style="color: #94A3B8;">Min bid: ₱{min_bid_display(@listing.current_price)}</p>
               </div>
               <% # Recent Bids %>
               <div :if={(@listing.bids || []) != []} class="mt-6">
@@ -119,7 +127,7 @@ defmodule BidphWeb.PageHTML do
                     style="background-color: #2D3748;"
                   >
                     <span class="text-white">Bidder</span>
-                    <span class="font-semibold" style="color: #F97316;">${Decimal.to_string(bid.amount)}</span>
+                    <span class="font-semibold" style="color: #F97316;">₱{Decimal.to_string(bid.amount)}</span>
                     <span style="color: #94A3B8;">{format_bid_ago(bid.inserted_at)}</span>
                   </li>
                 </ul>
@@ -158,13 +166,13 @@ defmodule BidphWeb.PageHTML do
   def listing_card(assigns) do
     ~H"""
     <.link href={~p"/listings/#{@listing.id}"} class="group block">
-      <article class="overflow-hidden rounded-xl border border-base-300 bg-base-100 shadow-sm transition hover:border-primary/50 hover:shadow-md">
-        <div class="relative aspect-[4/3] bg-base-300">
+      <article class="overflow-hidden rounded-2xl border border-base-200 bg-base-100 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:border-[#F97316]/50">
+        <div class="relative aspect-[4/3] bg-base-300 overflow-hidden">
           <img
             :if={@listing.image_urls != []}
             src={List.first(@listing.image_urls)}
             alt={@listing.title}
-            class="h-full w-full object-cover transition group-hover:scale-[1.02]"
+            class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
           />
           <div :if={@listing.image_urls == []} class="flex h-full w-full items-center justify-center text-base-content/30">
             <.icon name="hero-photo" class="size-12" />
@@ -182,7 +190,7 @@ defmodule BidphWeb.PageHTML do
         <div class="p-4">
           <h4 class="line-clamp-2 font-semibold text-base-content">{@listing.title}</h4>
           <p class="mt-1 text-xs text-base-content/60">Current Bid</p>
-          <p class="font-bold text-primary">${Decimal.to_string(@listing.current_price)}</p>
+          <p class="font-bold text-primary">₱{Decimal.to_string(@listing.current_price)}</p>
           <div class="mt-2 flex items-center gap-3 text-xs text-base-content/60">
             <span class="flex items-center gap-1">
               <.icon name="hero-user" class="size-3.5" />
